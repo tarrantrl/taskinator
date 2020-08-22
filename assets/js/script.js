@@ -3,6 +3,8 @@ var taskIdCounter = 0;
 
 var formEl = document.querySelector("#task-form");
 var tasksToDoEl = document.querySelector("#tasks-to-do");
+var tasksInProgressEl = document.querySelector("#tasks-in-progress");
+var tasksCompletedEl = document.querySelector("#tasks-completed");
 var pageContentEl = document.querySelector("#page-content");
 // console.dir(formEl);
 
@@ -149,6 +151,26 @@ var completeEditTask = function(taskName, taskType, taskId){
     document.querySelector("#save-task").textContent = "Add Task";
 }
 
+var taskStatusChangeHandler = function(event){
+    // event.target is the element that triggered the event
+    // get task item id
+    var taskId = event.target.getAttribute("data-task-id");
+    // get currently selected options value and convert to lowercase
+    var statusValue = event.target.value.toLowerCase();
+    // find parent task item
+    var taskSelected = document.querySelector(".task-item[data-task-id='"+taskId+"']");
+    // append task to proper section based on statusValue
+    if (statusValue === "to do"){
+        tasksToDoEl.appendChild(taskSelected);
+    } else if (statusValue === "in progress"){
+        tasksInProgressEl.appendChild(taskSelected);
+    }else if (statusValue === "completed"){
+        tasksCompletedEl.appendChild(taskSelected);
+    }
+}
+
 formEl.addEventListener("submit", taskFormHandler);
 
 pageContentEl.addEventListener("click", taskButtonHandler);
+
+pageContentEl.addEventListener("change", taskStatusChangeHandler);
