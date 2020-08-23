@@ -66,6 +66,7 @@ var createTaskEl = function(taskDataObj){
     taskDataObj.id = taskIdCounter;
     // add task to task array
     tasks.push(taskDataObj);
+    saveTasks();
     //increment counter
     taskIdCounter++;
 }
@@ -141,6 +142,7 @@ var deleteTask = function(taskId){
     }
     // reassign tasks array to be updatedTaskArr
     tasks = updatedTaskArr;
+    saveTasks();
 }
 
 var editTask = function(taskId){
@@ -174,6 +176,8 @@ var completeEditTask = function(taskName, taskType, taskId){
         }
     }
 
+    saveTasks();
+
     //alert("Task Updated!");
     // revert task add form changes
     formEl.removeAttribute("data-task-id");
@@ -202,18 +206,13 @@ var taskStatusChangeHandler = function(event){
             tasks[i].status = statusValue;
         }
     }
+    saveTasks();
 }
 
 var dragTaskHandler = function(event){
     var taskId = event.target.getAttribute("data-task-id");
     // store data in the dataTransfer property of the event object itself
     event.dataTransfer.setData("text/plain", taskId);
-    // loop through tasks to find and update the updated task's status
-    for (var i = 0; i < tasks.length; i++){
-        if (tasks[i].id === parseInt(taskId)){
-            tasks[i].status = statusSelectEl.value.toLowerCase();
-        }
-    }
 }
 
 var dropZoneDragHandler = function(event){
@@ -252,6 +251,13 @@ var dropTaskHandler = function(event){
     dropZoneEl.appendChild(draggableElement);
 
     dropZoneEl.removeAttribute("style");
+    // loop through tasks to find and update the updated task's status
+    for (var i = 0; i < tasks.length; i++){
+        if (tasks[i].id === parseInt(taskId)){
+            tasks[i].status = statusSelectEl.value.toLowerCase();
+        }
+    }
+    saveTasks();
 }
 
 var dragLeaveHandler = function(event){
@@ -259,6 +265,10 @@ var dragLeaveHandler = function(event){
     if (taskListEl){
         taskListEl.removeAttribute("style");
     }
+}
+
+var saveTasks = function() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
 formEl.addEventListener("submit", taskFormHandler);
