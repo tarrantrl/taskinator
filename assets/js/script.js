@@ -182,7 +182,8 @@ var dropZoneDragHandler = function(event){
     // closest() searches up through ancestor elements of event.target, which is the drop zone
     var taskListEl = event.target.closest(".task-list");
     if (taskListEl){
-        event.preventDefault();    
+        event.preventDefault();
+        taskListEl.setAttribute("style", "background: rgba(68, 233, 255, 0.7); border-style: dashed;");    
     }
 }
 
@@ -210,6 +211,15 @@ var dropTaskHandler = function(event){
     }
     // append the dragged task item to the destination drop zone
     dropZoneEl.appendChild(draggableElement);
+
+    dropZoneEl.removeAttribute("style");
+}
+
+var dragLeaveHandler = function(event){
+    var taskListEl = event.target.closest(".task-list");
+    if (taskListEl){
+        taskListEl.removeAttribute("style");
+    }
 }
 
 formEl.addEventListener("submit", taskFormHandler);
@@ -223,3 +233,5 @@ pageContentEl.addEventListener("dragstart", dragTaskHandler);
 pageContentEl.addEventListener("dragover", dropZoneDragHandler);
 
 pageContentEl.addEventListener("drop", dropTaskHandler);
+
+pageContentEl.addEventListener("dragleave", dragLeaveHandler);
