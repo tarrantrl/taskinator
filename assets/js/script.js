@@ -47,6 +47,8 @@ var createTaskEl = function(taskDataObj){
     listItemEl.className="task-item";
     //add task id as custom attribute
     listItemEl.setAttribute("data-task-id", taskIdCounter);
+    // make list items draggable
+    listItemEl.setAttribute("draggable", "true");
     // create div
     var taskInfoEl = document.createElement("div");
     taskInfoEl.className = "task-info";
@@ -169,8 +171,55 @@ var taskStatusChangeHandler = function(event){
     }
 }
 
+var dragTaskHandler = function(event){
+    var taskId = event.target.getAttribute("data-task-id");
+    // store data in the dataTransfer property of the event object itself
+    event.dataTransfer.setData("text/plain", taskId);
+}
+
+var dropZoneDragHandler = function(event){
+    // target of dragover is the element that is being dragged over, not the element being dragged
+    // closest() searches up through ancestor elements of event.target, which is the drop zone
+    var taskListEl = event.target.closest(".task-list");
+    if (taskListEl){
+        event.preventDefault();    
+    }
+}
+
+var dropTaskHandler = function(event){
+    // retrieve original dragged task from dataTransfer
+    var id = event.dataTransfer.getData("text/plain");
+    
+    // reference the destination of drop as a DOM element
+    var draggableElement = document.querySelector("[data-task-id='"+id+"']");
+    
+    // figure out where the item was dropped to get the task status
+    // event.target in drop is the element that gets dropped on
+    var dropZoneEl = event.target.closest(".task-list");
+    var statusType = dropZoneEl.id;
+    // update the task status
+    var statusSelectEl = draggableElement.querySelector("select[name='status-change']");
+    if (statusType === "tasks-to-do"){
+        statusSelectEl.selectedIndex = 0;
+    }
+    else if (statusType === "tasks-in-progress"){
+        statusSelectEl.selectedIndex = 1;
+    }
+    else if (statusType === "tasks-completed"){
+        statusSelectEl.selectedIndex = 2;
+    }
+    // append the dragged task item to the destination drop zone
+    dropZoneEl.appendChild(draggableElement);
+}
+
 formEl.addEventListener("submit", taskFormHandler);
 
 pageContentEl.addEventListener("click", taskButtonHandler);
 
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
+
+pageContentEl.addEventListener("dragstart", dragTaskHandler);
+
+pageContentEl.addEventListener("dragover", dropZoneDragHandler);
+
+pageContentEl.addEventListener("drop", dropTaskHandler);
